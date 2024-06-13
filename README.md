@@ -42,6 +42,10 @@ After running the simulation, you can view the generated reports and visualizati
 - geopy
 - simpy
 - folium
+If any erorr occurs in the installation regarding the packages then run 
+```bash
+pip install pandas geopandas shapely geopy simpy folium
+```
 
 You can install these packages using the provided `requirements.txt` file:
 
