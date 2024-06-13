@@ -6,7 +6,6 @@ This project simulates a GPS-based toll collection system using Python. It inclu
 ## Steps to Replicate:
 
 ### 1. Clone the Repository
-```
 ```bash
 git clone https://github.com/ayuktha63/Intel-Project.git
 cd Intel-Project
