@@ -1,13 +1,12 @@
+### GPS Toll based System Simulation
 
 ```markdown
-# GPS Toll based System Simulation
-
 This project simulates a GPS-based toll collection system using Python. It includes components such as vehicle movement simulation, toll zone definition, toll calculation, and payment simulation.
 
 ## Steps to Replicate:
 
 ### 1. Clone the Repository
-
+```
 ```bash
 git clone https://github.com/ayuktha63/Intel-Project.git
 cd Intel-Project
