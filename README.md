@@ -11,15 +11,9 @@ git clone https://github.com/ayuktha63/Intel-Project.git
 cd Intel-Project
 ```
 
-### 2. Install Dependencies
 
-Make sure you have Python 3.x installed on your system. Then, install the required Python packages using pip:
 
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Run the Simulation
+### 2. Run the Simulation
 
 Execute the main Python script to run the simulation:
 
@@ -27,7 +21,7 @@ Execute the main Python script to run the simulation:
 python simulate.py
 ```
 
-### 4. View Results
+### 3. View Results
 
 After running the simulation, you can view the generated reports and visualization:
 
@@ -47,11 +41,5 @@ After running the simulation, you can view the generated reports and visualizati
 If any erorr occurs in the installation regarding the packages then run 
 ```bash
 pip install pandas geopandas shapely geopy simpy folium
-```
-
-You can install these packages using the provided `requirements.txt` file:
-
-```bash
-pip install -r requirements.txt
 ```
 
