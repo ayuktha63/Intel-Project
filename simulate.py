@@ -1,22 +1,19 @@
 import simpy
 import random
 from shapely.geometry import Point, Polygon
-from geopy.distance import distance
+from geopy.distance import geodesic as geopy_distance
 import pandas as pd
 import matplotlib.pyplot as plt
 import folium
 
 # Constants and Parameters
 NUM_VEHICLES = 5
-TOLL_ZONE_POLYGONS = [
-    Polygon([(0, 0), (0, 5), (5, 5), (5, 0)]),
-    Polygon([(3, 3), (3, 8), (8, 8), (8, 3)])
-]
+TOLL_ZONE_POLYGON = Polygon([(28.6139, 77.2090), (28.6139, 78.2090), (29.6139, 78.2090), (29.6139, 77.2090)])  # Example toll zone around Delhi
 TOLL_RATE_PER_KM = 10  # Example toll rate per kilometer
 
 # Simulation environment setup
 env = simpy.Environment()
-vehicle_data_list = [] # Use a list to store vehicle data
+vehicle_data_list = []  # Use a list to store vehicle data
 
 class Vehicle:
     def __init__(self, env, vehicle_id, start_location, destination):
@@ -27,30 +24,26 @@ class Vehicle:
         self.position = start_location
         self.distance_traveled = 0
         self.toll_paid = 0
+        self.path = [start_location]
 
     def move(self):
         while self.position != self.destination:
-            # Simulate movement along a path (in a simplified manner)
             next_location = self.calculate_next_location()
             yield self.env.timeout(1)  # Simulate time passing
-            self.distance_traveled += distance(self.position, next_location).km
+            self.distance_traveled += geopy_distance((self.position[0], self.position[1]), (next_location[0], next_location[1])).km
             self.position = next_location
+            self.path.append(next_location)
             print(f"Vehicle {self.vehicle_id} moved to {self.position}")
 
-            # Check for toll zone crossing
-            for zone_polygon in TOLL_ZONE_POLYGONS:
-                if zone_polygon.contains(Point(self.position)):
-                    toll_amount = self.calculate_toll()
-                    self.toll_paid += toll_amount
-                    print(f"Vehicle {self.vehicle_id} entered toll zone. Toll paid: ${toll_amount}")
+            if TOLL_ZONE_POLYGON.contains(Point(self.position)):
+                toll_amount = self.calculate_toll()
+                self.toll_paid = toll_amount
+                print(f"Vehicle {self.vehicle_id} entered toll zone. Toll paid: ${toll_amount}")
 
     def calculate_next_location(self):
-        # Simplified logic to calculate the next location
-        # This can involve moving along a predefined route or randomly moving within a defined area
-        # Here, we simulate random movement for demonstration purposes
-        next_x = self.position[0] + random.uniform(-0.01, 0.01)
-        next_y = self.position[1] + random.uniform(-0.01, 0.01)
-        return (next_x, next_y)
+        next_lat = self.position[0] + random.uniform(-0.01, 0.01)  # Adjust range for realism
+        next_lon = self.position[1] + random.uniform(-0.01, 0.01)  # Adjust range for realism
+        return (next_lat, next_lon)
 
     def calculate_toll(self):
         return self.distance_traveled * TOLL_RATE_PER_KM
@@ -58,9 +51,9 @@ class Vehicle:
 # Create vehicles and start simulation
 vehicles = []
 for i in range(NUM_VEHICLES):
-    start_location = (random.uniform(0, 10), random.uniform(0, 10))
-    destination = (random.uniform(0, 10), random.uniform(0, 10))
-    vehicle = Vehicle(env, i+1, start_location, destination)
+    start_location = (random.uniform(28.5, 29.5), random.uniform(77.0, 78.0))  # Adjusted to a region in India
+    destination = (random.uniform(28.5, 29.5), random.uniform(77.0, 78.0))  # Adjusted to a region in India
+    vehicle = Vehicle(env, i + 1, start_location, destination)
     vehicles.append(vehicle)
     env.process(vehicle.move())
 
@@ -69,7 +62,7 @@ env.run(until=20)  # Run for a specified duration or until a condition
 
 # Generate summary report
 for vehicle in vehicles:
-    vehicle_data_list.append({ # Append vehicle data to the list
+    vehicle_data_list.append({
         'Vehicle ID': vehicle.vehicle_id,
         'Start': vehicle.start_location,
         'Destination': vehicle.destination,
@@ -80,26 +73,24 @@ for vehicle in vehicles:
 # Create DataFrame from the list of dictionaries
 vehicle_data = pd.DataFrame(vehicle_data_list)
 
-print("\nSimulation Summary:")
+print("\nSimulation Summary:\n")
 print(vehicle_data)
 
 # Visualization using Folium
-map_center = (5, 5)  # Center of the map
+map_center = (28.6139, 77.2090)  # Center of the map (New Delhi, India)
 map_osm = folium.Map(location=map_center, zoom_start=10)
 
-# Add toll zones to the map
-for idx, zone_polygon in enumerate(TOLL_ZONE_POLYGONS):
-    folium.Polygon(locations=[[(point[1], point[0]) for point in zone_polygon.exterior.coords]],
-                   color='blue',
-                   fill=True,
-                   fill_color='blue',
-                   fill_opacity=0.4,
-                   popup=f'Toll Zone {idx+1}').add_to(map_osm)
+# Add toll zone to the map
+folium.Polygon(locations=[(point[0], point[1]) for point in TOLL_ZONE_POLYGON.exterior.coords],
+               color='blue',
+               fill=True,
+               fill_color='blue',
+               fill_opacity=0.4,
+               popup='Toll Zone').add_to(map_osm)
 
 # Add vehicle paths to the map
 for vehicle in vehicles:
-    folium.PolyLine(locations=[(vehicle.start_location[1], vehicle.start_location[0]),
-                               (vehicle.destination[1], vehicle.destination[0])],
+    folium.PolyLine(locations=[(loc[0], loc[1]) for loc in vehicle.path],
                     color='green',
                     weight=2.5,
                     popup=f'Vehicle {vehicle.vehicle_id}').add_to(map_osm)
