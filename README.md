@@ -40,6 +40,6 @@ After running the simulation, you can view the generated reports and visualizati
   
 If any erorr occurs in the installation regarding the packages then run 
 ```bash
-pip install pandas geopandas shapely geopy simpy folium
+pip install pandas geopandas shapely geopy simpy folium matplotlib
 ```
 
