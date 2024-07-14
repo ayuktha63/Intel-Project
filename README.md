@@ -28,6 +28,13 @@ After running the simulation, you can view the generated reports and visualizati
 - Check the console output for simulation details.
 - Open `toll_zones.html` in a web browser to visualize the toll zones on a map.
 
+### 4. Images
+Here are some of the images took while testing the Project and the images are inside 
+
+-  images/mapzone.png 
+- images/statitics.png
+- images/terminalrun.png
+
 ## Required Python Packages:
 
 - pandas
